@@ -1,0 +1,33 @@
+# 의존성
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# 빌드 결과물
+dist/
+build/
+*.egg-info/
+.next/
+out/
+
+# 환경변수
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 로그
+*.log
+npm-debug.log*
