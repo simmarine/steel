@@ -1,6 +1,6 @@
 // async function loadNewsData(date) {
 //     try {
-//         const response = await fetch("http://203.253.181.161:8080/get-news", {
+//         const response = await fetch("${API_CONFIG.NODE_API}/get-news", {
 //             method: "POST",
 //             headers: { "Content-Type": "application/json" },
 //             body: JSON.stringify({ date: date })
@@ -58,7 +58,7 @@
 // });
 async function loadNewsData(date) {
     try {
-        const response = await fetch("http://203.253.181.161:8080/get-news", {
+        const response = await fetch("${API_CONFIG.NODE_API}/get-news", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ date: date })
@@ -103,7 +103,7 @@ async function loadNewsData(date) {
 async function initializeDatePicker() {
     try {
         // 서버에서 엑셀 데이터의 마지막 날짜 가져오기
-        const response = await fetch("http://203.253.181.161:5050/get-last-date");
+        const response = await fetch("${API_CONFIG.FLASK_API}/get-last-date");
         if (!response.ok) throw new Error("Failed to fetch last date");
 
         const data = await response.json();

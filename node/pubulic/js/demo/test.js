@@ -9,7 +9,7 @@ async function loadChartData(fileName, chartId) {
     loadingSpinner.style.display = 'block';
 
     try {
-        const response = await fetch('http://203.253.181.161:5050/get-chart-data', {
+        const response = await fetch('${API_CONFIG.FLASK_API}/get-chart-data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ file_name: fileName })

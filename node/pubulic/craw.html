@@ -1,404 +1,324 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>HOME</title>
-
-    <!-- Custom fonts for this template-->
+    <title>SteelAI - 데이터 관리</title>
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
-
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.6.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,...">
-
-    <!-- Custom styles for this template-->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-
+    <link href="css/steelai.css" rel="stylesheet">
+    <style>
+        .step-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: #4e73df; color: #fff;
+            font-size: .8rem; font-weight: 700;
+            margin-right: 8px; flex-shrink: 0;
+        }
+        .form-section-title {
+            font-size: .75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .06em; color: #858796; margin-bottom: 1rem;
+        }
+        .table thead th { font-size: .8rem; }
+    </style>
 </head>
 
 <body id="page-top">
-    <!-- Page Wrapper -->
-    <div id="wrapper">
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+<div id="wrapper">
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-                <div class="sidebar-brand-icon">
-                    <!-- rotate-n-15 클래스를 제거하고 이미지 태그 추가 -->
-                    <img src="img/kisco_logo.png" alt="Kisco Logo" style="width: 40px; height: auto;">
-                </div>
-                <div class="sidebar-brand-text mx-3">Kisco<sup>Steel</sup></div>
+    <!-- ── 사이드바 ──────────────────────────────────────────── -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <div class="sidebar-brand-icon">
+                <i class="fas fa-chart-line fa-lg"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">Steel<sup>AI</sup></div>
+        </a>
+        <hr class="sidebar-divider my-0">
+
+        <li class="nav-item">
+            <a class="nav-link" href="index.html">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>대시보드</span>
             </a>
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
+        </li>
+        <hr class="sidebar-divider">
 
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item active">
-                <a class="nav-link" href="index.html">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>HOME</span></a>
-            </li>
+        <div class="sidebar-heading">분석</div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
+        <li class="nav-item">
+            <a class="nav-link" href="test.html">
+                <i class="fas fa-fw fa-chart-bar"></i>
+                <span>AI 예측 성능</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="tables.html">
+                <i class="fas fa-fw fa-newspaper"></i>
+                <span>철강 뉴스</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider">
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Interface
-            </div>
+        <div class="sidebar-heading">관리</div>
 
-            <!-- Nav Item - Pages Collapse Menu -->
-                         <!-- Nav Item - Charts -->
+        <li class="nav-item active">
+            <a class="nav-link" href="craw.html">
+                <i class="fas fa-fw fa-database"></i>
+                <span>데이터 관리</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider d-none d-md-block">
 
-            <!-- Nav Item - Charts -->
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="charts.html">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>단가 및 물동량 예측</span></a>
-            </li> -->
-            
-            <li class="nav-item">
-                <a class="nav-link" href="test.html">
-                    <i class="fas fa-fw fa-file"></i>
-                    <span>모델 성능 확인</span></a>
-            </li>
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+    <!-- ── End Sidebar ─────────────────────────────────────── -->
 
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>철강 뉴스</span></a>
-            </li>
-            <!-- Nav Item - Tables -->
-            <li class="nav-item active">
-                <a class="nav-link" href="craw.html">
-                    <i class="fa fa-upload" aria-hidden="true"></i>
-                    <span>데이터 추가</span></a>
-            </li>
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
 
-
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
-        </ul>
-        <!-- End of Sidebar -->
-
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-
-            <!-- Main Content -->
-            <div id="content">
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
-
-                    <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
+            <!-- ── 상단 네비 ───────────────────────────────── -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <span class="navbar-brand font-weight-bold text-gray-700 ml-3 d-none d-sm-inline">
+                    데이터 관리
+                </span>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
+                           role="button" data-toggle="dropdown">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">관리자</span>
+                            <div class="img-profile rounded-circle bg-gradient-primary d-inline-flex align-items-center justify-content-center"
+                                 style="width:32px;height:32px;">
+                                <i class="fas fa-user text-white" style="font-size:.85rem;"></i>
                             </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="userDropdown">
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> 로그아웃
+                            </a>
                         </div>
-                    </form>
+                    </li>
+                </ul>
+            </nav>
+            <!-- ── End 상단 네비 ─────────────────────────── -->
 
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
+            <!-- ── 본문 ───────────────────────────────────── -->
+            <div class="container-fluid">
 
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-search fa-fw"></i>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" cldass="form-control bg-light border-0 small"
-                                            placeholder="Search for..." aria-label="Search"
-                                            aria-describedby="basic-addon2">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </li>
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-database mr-2 text-primary"></i>데이터 관리
+                    </h1>
+                    <div>
+                        <button id="downloadPriceButton" class="btn btn-outline-primary btn-sm mr-2">
+                            <i class="fas fa-download mr-1"></i> 기본단가 다운로드
+                        </button>
+                        <button id="downloadSpecialPriceButton" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-download mr-1"></i> 특구가 다운로드
+                        </button>
+                    </div>
+                </div>
 
-                        <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">3+</span>
-                            </a>
-                            <!-- Dropdown - Alerts -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">
-                                    Alerts Center
+                <!-- 최근 데이터 -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-history mr-1"></i> 최근 5일 데이터
+                        </h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="recentDataContainer">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>일자</th>
+                                        <th>기본단가 (중A)</th>
+                                        <th>특별구매단가 (중A_특)</th>
+                                        <th>입고량</th>
+                                        <th>재고량</th>
+                                        <th>입고율</th>
+                                        <th>제강생산량</th>
+                                        <th>고철투입량</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentDataBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4 text-muted">
+                                            <i class="fas fa-spinner fa-spin"></i> 로딩 중...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- 데이터 입력 -->
+                    <div class="col-lg-7 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-plus-circle mr-1"></i> 신규 데이터 입력
                                 </h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2024</div>
-                                        <span class="font-weight-bold">금일 뉴스 스크랩 업데이트</span>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2024</div>
-                                        철강 단가 예측 업데이트
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2024</div>
-                                        데이터 업데이트 필요
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
                             </div>
-                        </li>
-
-                        
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">관리자 계정</span>
-                                <img class="img-profile rounded-circle"
-                                    src="img/undraw_profile.svg">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
+                            <div class="card-body">
+                                <p class="text-muted small mb-3">단가 및 물동량 데이터를 수동으로 입력합니다.</p>
+                                <form id="priceSpecialPriceForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label font-weight-bold small">일자 <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control form-control-sm" id="dateInput" name="일자" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label font-weight-bold small">기본단가 (중A)</label>
+                                            <input type="number" class="form-control form-control-sm" name="중A" placeholder="원/kg">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label font-weight-bold small">특별구매단가 (중A_특)</label>
+                                            <input type="number" class="form-control form-control-sm" name="중A_특" placeholder="원/kg">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label font-weight-bold small">입고량 <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control form-control-sm" name="입고량" placeholder="ton" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label font-weight-bold small">재고량 <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control form-control-sm" name="재고량" placeholder="ton" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label font-weight-bold small">제강생산량 <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control form-control-sm" name="제강생산량" placeholder="ton" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label font-weight-bold small">고철투입량 <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control form-control-sm" name="고철투입량" placeholder="ton" required>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="submitData" class="btn btn-primary btn-sm px-4">
+                                        <i class="fas fa-save mr-1"></i> 데이터 저장
+                                    </button>
+                                </form>
+                                <div id="responseMessage" class="mt-3"></div>
                             </div>
-                        </li>
-                    </ul>
-                </nav>
-                <!-- End of Topbar -->
-
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
-                    <h2 class="d-flex justify-content-between align-items-center">
-                        Data Input and Crawling
-                        <div>
-                            <button id="downloadPriceButton" class="btn btn-primary btn-sm mr-2">Download 기본단가</button>
-                            <button id="downloadSpecialPriceButton" class="btn btn-secondary btn-sm">Download 특구가</button>
                         </div>
-                    </h2>
-                    <p>아래 탭을 선택하여 단가/특별구매단가 데이터를 기본 데이터와 함께 입력할 수 있습니다.</p>
-                    <hr>
-                    <!-- 최근 데이터 표시 -->
-                    <div id="recentDataContainer" class="mb-4">
-                        <h4>최근 5일 데이터</h4>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>일자</th>
-                                    <th>기본단가(중A)</th>
-                                    <th>특별구매단가(중A_특)</th>
-                                    <th>입고량</th>
-                                    <th>재고량</th>
-                                    <th>입고율</th>
-                                    <th>제강생산량</th>
-                                    <th>고철투입량</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recentDataBody"></tbody>
-                        </table>
                     </div>
-                
 
-                    <div class="container mt-5">
-                        <h3>단가 및 특별구매단가 데이터 입력</h3>
-                        <form id="priceSpecialPriceForm">
-                            <div class="mb-3">
-                                <label class="form-label">Date (일자)</label>
-                                <input type="date" class="form-control" id="dateInput" name="일자" required>
+                    <!-- 모델 업데이트 -->
+                    <div class="col-lg-5 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-sync-alt mr-1"></i> 모델 업데이트
+                                </h6>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">입고량</label>
-                                <input type="number" class="form-control" name="입고량" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">재고량</label>
-                                <input type="number" class="form-control" name="재고량" required>
-                            </div>
-                            <!-- <div class="mb-3">
-                                <label class="form-label">입고율</label>
-                                <input type="number" class="form-control" name="입고율" step="0.01" required>
-                            </div> -->
-                            <div class="mb-3">
-                                <label class="form-label">제강생산량</label>
-                                <input type="number" class="form-control" name="제강생산량" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">고철투입량</label>
-                                <input type="number" class="form-control" name="고철투입량" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">기본단가(중A)</label>
-                                <input type="number" class="form-control" name="중A">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">특별구매단가(중A_특)</label>
-                                <input type="number" class="form-control" name="중A_특">
-                            </div>
-                            <button type="button" id="submitData" class="btn btn-primary">Submit Data</button>
-                        </form>
-                    </div>
-                
-                    <div class="tab-content mt-3" id="myCardContent">
-                        <div class="row justify-content-center">
-                            <div class="col-md-6">
-                                <div class="card h-100 text-center">
-                                    <div class="card-body d-flex flex-column justify-content-center">
-                    
-                                        <!-- 🔽 최근 업데이트 일자 -->
-                                        <p id="lastUpdate" class="text-muted mb-2" style="font-weight: bold;">
-                                            최근 업데이트 일자: - 
-                                        </p>
-                    
-                                        <h5 class="card-title">모델 업데이트</h5>
-                                        <p class="card-text">아래 버튼을 누르면 크롤링, 보간, 업데이트 작업이 순서대로 실행되며 업데이트 일자가 표시됩니다.</p>
-                    
-                                        <!-- 🔘 버튼 -->
-                                        <button type="button" id="singleUpdateButton" class="btn btn-primary mt-auto">업데이트</button>
-                    
-                                        <!-- 🔄 스피너 위치 이동 -->
-                                        <div id="loadingSpinner" class="d-none text-center mt-3" style="min-height: 80px;">
-                                            <div class="spinner-border text-primary" role="status"></div>
-                                            <p class="mt-2">처리중...</p>
-                                        </div>
-                    
-                                        <!-- ✅ 결과 메시지 -->
-                                        <div id="taskResult" class="mt-4 text-muted"></div>
+                            <div class="card-body d-flex flex-column">
+                                <p class="text-muted small">
+                                    아래 버튼을 클릭하면 크롤링 → 보간 → DB 업데이트 작업이 순서대로 실행됩니다.
+                                </p>
+
+                                <!-- 단계 안내 -->
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="step-badge">1</span>
+                                        <span class="small">외부 데이터 크롤링</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="step-badge">2</span>
+                                        <span class="small">결측값 보간 처리</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="step-badge">3</span>
+                                        <span class="small">DB 업데이트 및 예측 갱신</span>
                                     </div>
                                 </div>
+
+                                <div class="mb-3">
+                                    <div class="small text-muted">
+                                        최근 업데이트:
+                                        <span id="lastUpdate" class="font-weight-bold text-dark">-</span>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="singleUpdateButton" class="btn btn-primary mt-auto">
+                                    <i class="fas fa-play mr-1"></i> 업데이트 실행
+                                </button>
+
+                                <div id="loadingSpinner" class="d-none text-center mt-3">
+                                    <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+                                    <span class="ml-2 small">처리 중...</span>
+                                </div>
+
+                                <div id="taskResult" class="mt-3 small"></div>
                             </div>
                         </div>
                     </div>
-                    <div id="responseMessage" class="mt-3"></div>
-
-            <!-- Content Row -->
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; kisco_steel 2024</span>
-                    </div>
                 </div>
-            </footer>
-            <!-- End of Footer -->
+
+            </div>
+            <!-- ── End 본문 ──────────────────────────────── -->
+
         </div>
-        <!-- End of Content Wrapper -->
 
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; SteelAI 2025</span>
+                </div>
+            </div>
+        </footer>
     </div>
-    <!-- End of Page Wrapper -->
+</div>
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                <button class="close btn btn-secondary" type="button" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+                <h5 class="modal-title">로그아웃</h5>
+                <button class="close" type="button" data-dismiss="modal"><span>&times;</span></button>
             </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-body">현재 세션을 종료하시겠습니까?</div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="login.html">Logout</a>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">취소</button>
+                <a class="btn btn-primary" href="index.html">로그아웃</a>
             </div>
         </div>
     </div>
-    </div>
-
+</div>
 
 <script>
-    // 오늘 날짜를 ISO 형식으로 반환
-    function getTodayDate() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    // 페이지 로드 시 기본값 설정
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
         const dateInput = document.getElementById('dateInput');
-        dateInput.value = getTodayDate(); // 기본값을 오늘 날짜로 설정
+        if (dateInput) {
+            const today = new Date();
+            dateInput.value = today.getFullYear() + '-'
+                + String(today.getMonth() + 1).padStart(2, '0') + '-'
+                + String(today.getDate()).padStart(2, '0');
+        }
     });
 </script>
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
 
-    <script src="js/demo/craw.js"></script>
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="/js/config.js"></script>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/demo/craw.js"></script>
+<script src="vendor/chart.js/Chart.min.js"></script>
 </body>
-
 </html>

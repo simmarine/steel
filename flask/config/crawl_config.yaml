@@ -1,0 +1,103 @@
+# ============================================================
+# 크롤링 설정 파일
+# 사용처: flask/crawlers/ 각 모듈
+# ============================================================
+
+# ── steelprice.co.kr ──────────────────────────────────────
+steelprice:
+  login_url: "https://www.steelprice.co.kr/member/login.html"
+  list_url:  "https://www.steelprice.co.kr/news/articleList.html?sc_section_code=S1N9"
+  db_center_xpath: "//*[@id='user-menu']/li[7]/a"
+  max_pages: 100
+
+  # feature_id: [keyword, file_name]
+  features:
+    3:
+      keyword:   "일본산 고철 수입가격-스틸프라이스(W)"
+      file_name: "(W)일본산 고철 수입가격-스틸프라이스.xlsx"
+      old_file:  "(W)한국 고철 수입가격-스틸프라이스(23.8-14_피처3).xlsx"
+    4:
+      keyword:   "주요국(일 미 중) 고철 내수가격_스틸프라이스(W)"
+      file_name: "(W)주요국(일 미 중) 고철 내수가격_스틸프라이스.xlsx"
+    5:
+      keyword:   "튀르키예 & 동아시아 고철 수입가격_스틸프라이스(W)"
+      file_name: "(W)튀르키예 & 동아시아 고철 수입가격_스틸프라이스.xlsx"
+    6:
+      keyword:   "일본 관동철원협회 고철 수출텐더 낙찰가격_스틸프라이스(M)"
+      file_name: "(M)일본 관동철원협회 고철 수출텐더 낙찰가격_스틸프라이스.xlsx"
+    7:
+      keyword:   "철광석 & 원료탄 가격_스틸프라이스(W)"
+      file_name: "(W)철광석 원료탄 가격_스틸프라이스.xlsx"
+      old_file:  "(W)철광석 원료탄 가격_스틸프라이스(23.3-24_피처 7).xlsx"
+    10:
+      keyword:   "글로벌 봉형강류 시세_스틸프라이스(W)"
+      file_name: "(W)글로벌 봉형강류 시세_스틸프라이스.xlsx"
+      old_file:  "(W)글로벌 봉형강류 시세_스틸프라이스(23.3-24_피처10).xlsx"
+    12:
+      keyword:   "중국 내수 봉형강류 유통가격_스틸프라이스(W)"
+      file_name: "(W)중국 내수 봉형강류 유통가격_스틸프라이스.xlsx"
+
+# ── steeldaily.cgimall.co.kr ──────────────────────────────
+steeldaily_bigdata:
+  feature_2:
+    url_template: "https://steeldaily.cgimall.co.kr/index.php?c1=5&c2=141&nd_id=bigdata2024-79456363&ieuse=&start={start}"
+    page_size: 36
+  feature_38:
+    url_template: "https://steeldaily.cgimall.co.kr/index.php?start={start}&c1=1&c2=38&gen_cycle=1&nd_id=bigdata2024-23584830"
+    page_size: 36
+
+# ── ECOS API (한국은행) ────────────────────────────────────
+ecos:
+  base_url: "https://ecos.bok.or.kr/api/StatisticSearch/"
+  # API 키: 환경변수 ECOS_API_KEY
+
+  features:
+    13:  {table: "513Y001",  period: "M", end_no: 100}
+    22a: {table: "731Y001",  period: "D", item: "0000001", end_no: 1000}
+    22b: {table: "731Y002",  period: "D", item: "0000002", end_no: 1000}
+    31:  {table: "901Y067",  period: "M", end_no: 100}
+    32:  {table: "901Y066",  period: "M", end_no: 100}
+    33a: {table: "901Y032",  period: "M", item: "I11AB",   end_no: 100}
+    33b: {table: "901Y032",  period: "M", item: "I11AC",   end_no: 100}
+    34:  {table: "901Y025",  period: "M", end_no: 100}
+    35_price_a:  {table: "403Y001", period: "M", item: "307AA", end_no: 100}
+    35_price_b:  {table: "403Y001", period: "M", item: "308AA", end_no: 100}
+    35_volume_a: {table: "403Y002", period: "M", item: "307AA", end_no: 100}
+    35_volume_b: {table: "403Y002", period: "M", item: "308AA", end_no: 100}
+    36_price_a:  {table: "403Y003", period: "M", item: "307AA", end_no: 100}
+    36_price_b:  {table: "403Y003", period: "M", item: "308AA", end_no: 100}
+    36_volume_a: {table: "403Y004", period: "M", item: "307AA", end_no: 100}
+    36_volume_b: {table: "403Y004", period: "M", item: "308AA", end_no: 100}
+    37:  {table: "521Y001",  period: "D", item: "A001",    end_no: 1000}
+
+# ── KOSIS API (국가통계포털) ──────────────────────────────
+kosis:
+  base_url: "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList"
+  # API 키: 환경변수 KOSIS_API_KEY
+
+  features:
+    15: {orgId: "301", tblId: "DT_404Y016",      itmId: "13103134764999+", prdSe: "M", newEstPrdCnt: 6}
+    16: {orgId: "101", tblId: "DT_1G1B035",       itmId: "T1+",            prdSe: "M", newEstPrdCnt: 3}
+    17: {orgId: "397", tblId: "DT_39701_A003",    itmId: "16397AAA0+",     prdSe: "M", newEstPrdCnt: 3}
+    18: {orgId: "116", tblId: "DT_MLTM_1946",     itmId: "13103871089T1+", prdSe: "M", newEstPrdCnt: 3}
+    19: {orgId: "116", tblId: "DT_MLTM_5386",     itmId: "13103766971T1+", prdSe: "M", newEstPrdCnt: 3}
+    20: {orgId: "363", tblId: "TX_36301_A000",    itmId: "16363AAA0+",     prdSe: "M", newEstPrdCnt: 3}
+    21: {orgId: "301", tblId: "DT_102Y002",       itmId: "13103860813999+",prdSe: "M", newEstPrdCnt: 3}
+    24: {orgId: "343", tblId: "DT_343_2010_S0029",itmId: "13103792816T1+", prdSe: "M", newEstPrdCnt: 3}
+    25: {orgId: "343", tblId: "DT_343_2010_S0034",itmId: "13103792822T1+", prdSe: "M", newEstPrdCnt: 3}
+    26: {orgId: "343", tblId: "DT_343_2010_S0033",itmId: "13103792821T1+", prdSe: "M", newEstPrdCnt: 3}
+
+# ── opinet ────────────────────────────────────────────────
+opinet:
+  url: "https://www.opinet.co.kr/glopcoilSelect.do"
+  oil_codes: ["001", "002", "003"]
+
+# ── komis ─────────────────────────────────────────────────
+komis:
+  mineral_index_url: "https://www.komis.or.kr/Komis/MnrlIndc/IndxMin"
+  lme_url:           "https://www.komis.or.kr/Komis/RsrcPrice/BaseMetals"
+  mineral_codes:     ["MNRL0002", "MNRL0023", "MNRL0009", "MNRL0008"]
+
+# ── investing.com ─────────────────────────────────────────
+investing:
+  bdi_url: "https://kr.investing.com/indices/baltic-dry-historical-data"

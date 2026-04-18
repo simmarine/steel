@@ -8,7 +8,7 @@ function formatNumber(value, decimalPlaces = 0, useComma = true) {
 }
 
 async function loadRecentData() {
-    const response = await fetch('http://203.253.181.161:5050/get-recent-data');
+    const response = await fetch('${API_CONFIG.FLASK_API}/get-recent-data');
     const data = await response.json();
 
     const recentDataBody = document.getElementById('recentDataBody');
@@ -99,22 +99,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const runAllTasks = async () => {
         try {
             // ✅ 1. 크롤링 실행
-            await basicRequest('http://203.253.181.161:5050/run-crawling', 'POST', {
+            await basicRequest('${API_CONFIG.FLASK_API}/run-crawling', 'POST', {
                 start_date: '20250101',
                 end_date: '20251231'
             });
             document.getElementById('taskResult').innerText = '✅ 크롤링 완료';
 
             // ✅ 2. 보간 실행
-            await basicRequest('http://203.253.181.161:5050/interpolate-data');
+            await basicRequest('${API_CONFIG.FLASK_API}/interpolate-data');
             document.getElementById('taskResult').innerText = '✅ 보간 완료';
 
             // ✅ 3. 모델 업데이트 실행
-            await basicRequest('http://203.253.181.161:5050/run-all-versions');
+            await basicRequest('${API_CONFIG.FLASK_API}/run-all-versions');
             document.getElementById('taskResult').innerText = '✅ 예측값 업데이트 완료';
 
             // ✅ 날짜 저장 요청
-            const res = await fetch('http://203.253.181.161:5050/save-time', { method: 'POST' });
+            const res = await fetch('${API_CONFIG.FLASK_API}/save-time', { method: 'POST' });
             const data = await res.json();
             document.getElementById('lastUpdate').innerText = `최근 업데이트 일자: ${data.date}`;
 
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('singleUpdateButton').addEventListener('click', runAllTasks);
 
     // ✅ 페이지 로드시 최근 업데이트 일자 불러오기
-    fetch('http://203.253.181.161:5050/get-time')
+    fetch('${API_CONFIG.FLASK_API}/get-time')
         .then(res => res.json())
         .then(data => {
             document.getElementById('lastUpdate').innerText = `최근 업데이트 일자: ${data.lastUpdate}`;
@@ -140,12 +140,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // ✅ 다운로드 버튼 이벤트 연결
     const downloadPriceButton = document.getElementById('downloadPriceButton');
     downloadPriceButton?.addEventListener('click', () => {
-        window.location.href = 'http://203.253.181.161:5050/download-data-file';
+        window.location.href = '${API_CONFIG.FLASK_API}/download-data-file';
     });
 
     const downloadSpecialPriceButton = document.getElementById('downloadSpecialPriceButton');
     downloadSpecialPriceButton?.addEventListener('click', () => {
-        window.location.href = 'http://203.253.181.161:5050/download-special-data-file';
+        window.location.href = '${API_CONFIG.FLASK_API}/download-special-data-file';
     });
 });
 
@@ -174,7 +174,7 @@ document.getElementById('submitData').addEventListener('click', async () => {
 
     showSpinner();
     try {
-        const response = await fetch('http://203.253.181.161:5050/save-data', {
+        const response = await fetch('${API_CONFIG.FLASK_API}/save-data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),

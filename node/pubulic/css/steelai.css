@@ -1,0 +1,165 @@
+/* ============================================================
+   SteelAI 커스텀 테마
+   기존 sb-admin-2 파란색 계열을 딥 스틸 네이비로 교체
+   ============================================================ */
+
+/* ── 사이드바 배경 ── */
+.sidebar.bg-gradient-primary,
+.navbar-nav.bg-gradient-primary {
+    background-color: #1c2a3a !important;
+    background-image: linear-gradient(180deg, #1c2a3a 0%, #0d1821 100%) !important;
+}
+
+/* ── 사이드바 브랜드 영역 ── */
+.sidebar-brand {
+    background-color: rgba(0, 0, 0, 0.15) !important;
+}
+.sidebar-brand-text {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    color: #e2f0fb !important;
+}
+.sidebar-brand-icon i {
+    color: #7bbfea !important;
+}
+
+/* ── 사이드바 항목 ── */
+.sidebar-dark .nav-item .nav-link {
+    color: rgba(210, 230, 245, 0.75) !important;
+}
+.sidebar-dark .nav-item .nav-link:hover,
+.sidebar-dark .nav-item.active .nav-link {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-radius: 4px;
+}
+.sidebar-dark .nav-item.active .nav-link {
+    background: rgba(123, 191, 234, 0.18) !important;
+}
+.sidebar-dark hr.sidebar-divider {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.sidebar-dark .sidebar-heading {
+    color: rgba(123, 191, 234, 0.6) !important;
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+
+/* ── Primary 색상 전역 교체 ── */
+.text-primary         { color: #3a86c8 !important; }
+.bg-primary           { background-color: #2563a8 !important; }
+.border-left-primary  { border-left: .25rem solid #3a86c8 !important; }
+
+/* ── 버튼 ── */
+.btn-primary {
+    background-color: #2563a8 !important;
+    border-color: #1e5290 !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #1e5290 !important;
+    border-color: #184278 !important;
+    box-shadow: 0 0 0 .2rem rgba(37, 99, 168, .35) !important;
+}
+.btn-outline-primary {
+    color: #2563a8 !important;
+    border-color: #2563a8 !important;
+}
+.btn-outline-primary:hover {
+    background-color: #2563a8 !important;
+    color: #fff !important;
+}
+
+/* ── 상단바 (topbar) ── */
+.topbar {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e3e6f0;
+}
+.topbar .navbar-brand { color: #2c3e50 !important; }
+
+/* ── 카드 KPI 테두리색 (primary) ── */
+.card.border-left-primary { border-left: .25rem solid #3a86c8 !important; }
+
+/* ── 방향성 차트 전용 ── */
+.direction-up-bg   { background: rgba(28, 200, 138, 0.07); }
+.direction-down-bg { background: rgba(231, 74, 59, 0.07); }
+
+.forecast-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    font-size: .85rem;
+    font-weight: 700;
+}
+.forecast-badge.up   { background: rgba(28,200,138,.15); color: #1cc88a; }
+.forecast-badge.down { background: rgba(231,74,59,.15);  color: #e74a3b; }
+
+/* ── 확률 바 (방향성) ── */
+.dir-prob-bar-wrap {
+    height: 8px;
+    background: #eaecf4;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.dir-prob-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width .7s ease;
+}
+
+/* ── 차트 카드 헤더 ── */
+.chart-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .75rem 1.25rem;
+    border-bottom: 1px solid #e3e6f0;
+}
+.chart-legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+/* ── 스크롤 최상단 버튼 ── */
+.scroll-to-top {
+    background: #2563a8 !important;
+}
+
+/* ── 페이지 섹션 구분 ── */
+.section-divider {
+    border-top: 1px solid #e3e6f0;
+    margin: 1.25rem 0 1rem;
+}
+.section-title {
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: #8592a5;
+    margin-bottom: .85rem;
+}
+
+/* ── 방향성 예측 카드 (binary) ── */
+.binary-card-up    { border-left: 4px solid #1cc88a !important; }
+.binary-card-down  { border-left: 4px solid #e74a3b !important; }
+.binary-card-empty { border-left: 4px solid #b7b9cc !important; }
+
+.direction-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+.prob-bar-wrap { height: 6px; background: #eaecf4; border-radius: 3px; margin-top: 6px; }
+.prob-bar { height: 100%; border-radius: 3px; transition: width .6s ease; }
+
+/* ── 반응형 차트 높이 ── */
+.chart-area { position: relative; height: 280px; }
+.chart-area-sm { position: relative; height: 200px; }

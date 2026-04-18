@@ -1,466 +1,299 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>웹 페이지</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <title>Kisco - Tables</title>
-
-    <!-- Custom fonts for this template -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>SteelAI - 철강 뉴스</title>
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-
-    <!-- Custom styles for this page -->
+    <link href="css/steelai.css" rel="stylesheet">
     <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-
     <style>
-        /* Loading Overlay Styles */
         .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,.45);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 9999;
         }
-
         .loading-spinner {
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
+            border-top: 5px solid #4e73df;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        .badge-label { display: inline-block; width: 60px; text-align: center; }
+        #dataTable td { vertical-align: middle; }
     </style>
-
 </head>
 
 <body id="page-top">
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
 
-    <div class="loading-overlay">
-        <div class="loading-spinner"></div>
-    </div>
+<div id="wrapper">
 
-    <!-- Page Wrapper -->
-    <div id="wrapper">
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <!-- ── 사이드바 ──────────────────────────────────────────── -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <div class="sidebar-brand-icon">
+                <i class="fas fa-chart-line fa-lg"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">Steel<sup>AI</sup></div>
+        </a>
+        <hr class="sidebar-divider my-0">
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-                <div class="sidebar-brand-icon">
-                    <!-- rotate-n-15 클래스를 제거하고 이미지 태그 추가 -->
-                    <img src="img/kisco_logo.png" alt="Kisco Logo" style="width: 40px; height: auto;">
-                </div>
-                <div class="sidebar-brand-text mx-3">KISCO<sup>Steel</sup></div>
+        <li class="nav-item">
+            <a class="nav-link" href="index.html">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>대시보드</span>
             </a>
+        </li>
+        <hr class="sidebar-divider">
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
+        <div class="sidebar-heading">분석</div>
 
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="index.html">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>HOME</span></a>
-            </li>
+        <li class="nav-item">
+            <a class="nav-link" href="test.html">
+                <i class="fas fa-fw fa-chart-bar"></i>
+                <span>AI 예측 성능</span>
+            </a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="tables.html">
+                <i class="fas fa-fw fa-newspaper"></i>
+                <span>철강 뉴스</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider">
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
+        <div class="sidebar-heading">관리</div>
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Interface
-            </div>
+        <li class="nav-item">
+            <a class="nav-link" href="craw.html">
+                <i class="fas fa-fw fa-database"></i>
+                <span>데이터 관리</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider d-none d-md-block">
 
-            <!-- Nav Item - Charts -->
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="charts.html">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>단가 및 물동량 예측</span></a>
-            </li> -->
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+    <!-- ── End Sidebar ─────────────────────────────────────── -->
 
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="test.html">
-                    <i class="fas fa-fw fa-file"></i>
-                    <span>모델 성능 확인</span></a>
-            </li>
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
 
-            <!-- Nav Item - Tables -->
-            <li class="nav-item active">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>철강 뉴스</span></a>
-            </li>
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="craw.html">
-                    <i class="fa fa-upload" aria-hidden="true"></i>
-                    <span>데이터 추가</span></a>
-            </li>
+            <!-- ── 상단 네비 ───────────────────────────────── -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <span class="navbar-brand font-weight-bold text-gray-700 ml-3 d-none d-sm-inline">
+                    철강 뉴스
+                </span>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
+                           role="button" data-toggle="dropdown">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">관리자</span>
+                            <div class="img-profile rounded-circle bg-gradient-primary d-inline-flex align-items-center justify-content-center"
+                                 style="width:32px;height:32px;">
+                                <i class="fas fa-user text-white" style="font-size:.85rem;"></i>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="userDropdown">
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> 로그아웃
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- ── End 상단 네비 ─────────────────────────── -->
 
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
+            <!-- ── 본문 ───────────────────────────────────── -->
+            <div class="container-fluid">
 
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-newspaper mr-2 text-primary"></i>철강 뉴스
+                    </h1>
+                    <small class="text-muted">DB에서 실시간 조회</small>
+                </div>
 
-        </ul>
-        <!-- End of Sidebar -->
-
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-
-            <!-- Main Content -->
-            <div id="content">
-
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <form class="form-inline">
-                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                            <i class="fa fa-bars"></i>
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-list mr-1"></i> 뉴스 목록
+                        </h6>
+                        <button id="updateButton" class="btn btn-primary btn-sm">
+                            <i class="fas fa-sync-alt mr-1"></i> 기사 업데이트
                         </button>
-                    </form>
-
-                    <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-search fa-fw"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-                                            placeholder="Search for..." aria-label="Search"
-                                            aria-describedby="basic-addon2">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </li>
-
-                        <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">3+</span>
-                            </a>
-                            <!-- Dropdown - Alerts -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">
-                                    <!-- Alerts Center -->
-                                </h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2024</div>
-                                        <span class="font-weight-bold">금일 뉴스 스크랩 업데이트</span>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2024</div>
-                                        철강 단가 예측 업데이트
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2024</div>
-                                        데이터 업데이트 필요
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
-                            </div>
-                        </li>
-
-                        <!-- Nav Item - Messages -->
-                        
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">관리자</span>
-                                <img class="img-profile rounded-circle"
-                                    src="img/undraw_profile.svg">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </li>
-
-                    </ul>
-
-                </nav>
-                <!-- End of Topbar -->
-
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
-                    <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">철강 뉴스</h1>
-                
-                    <!-- DataTales Example -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary">철강 뉴스</h6>
-                            <a href="#" id="updateButton" class="btn btn-secondary btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-arrow-right"></i>
-                                </span>
-                                <span class="text">기사 업데이트</span>
-                            </a>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Link</th>
-                                            <th>Date</th>
-                                            <th>Title</th>
-                                            <th>Content</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- 데이터는 DataTables가 동적으로 로드 -->
-                                    </tbody>
-                                </table>
-                            </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width:35%">제목</th>
+                                        <th style="width:10%">날짜</th>
+                                        <th style="width:40%">내용 요약</th>
+                                        <th style="width:15%">링크</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
                         </div>
                     </div>
-                </div>                
-                <!-- /.container-fluid -->
-   
-        </div>
-        <!-- End of Main Content -->
+                </div>
+            </div>
+            <!-- ── End 본문 ──────────────────────────────── -->
 
-        <!-- Footer -->
+        </div>
+
         <footer class="sticky-footer bg-white">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
-                    <span>Copyright &copy; kisco_steel 2024</span>
+                    <span>Copyright &copy; SteelAI 2025</span>
                 </div>
             </div>
         </footer>
-        <!-- End of Footer -->
-
     </div>
-    <!-- End of Content Wrapper -->
-
 </div>
-<!-- End of Page Wrapper -->
 
-<!-- Scroll to Top Button-->
 <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
 </a>
 
-<!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+                <h5 class="modal-title">로그아웃</h5>
+                <button class="close" type="button" data-dismiss="modal"><span>&times;</span></button>
             </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-body">현재 세션을 종료하시겠습니까?</div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="login.html">Logout</a>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">취소</button>
+                <a class="btn btn-primary" href="index.html">로그아웃</a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap core JavaScript-->
+<script src="/js/config.js"></script>
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- Core plugin JavaScript-->
 <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-<!-- Custom scripts for all pages-->
 <script src="js/sb-admin-2.min.js"></script>
-
-<!-- Page level plugins -->
 <script src="vendor/datatables/jquery.dataTables.min.js"></script>
 <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
 <script>
 $(document).ready(function () {
-    const table = $('#dataTable').DataTable({
+    var table = $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
+        language: {
+            processing:   '처리 중...',
+            search:       '검색:',
+            lengthMenu:   '_MENU_ 건씩 보기',
+            info:         '전체 _TOTAL_건 중 _START_ ~ _END_',
+            infoEmpty:    '0건',
+            infoFiltered: '(전체 _MAX_건 중 검색)',
+            paginate: { first:'처음', last:'끝', next:'다음', previous:'이전' }
+        },
         ajax: {
-            url: '/data', // 백엔드 API URL
+            url: '/data',
             dataSrc: 'data',
-            data: function (d) {
-                d.start = d.start || 0;       // 시작 위치
-                d.length = d.length || 10;    // 페이지 크기
+            data: function(d) {
+                d.start  = d.start  || 0;
+                d.length = d.length || 10;
             }
         },
         columns: [
-            {
-                data: 'Link',
-                render: function (data) {
-                    if (data.length>10){
-                        const shortText =data.substring(0,10)+'...';
-                    }
-                    return `<a href="${data}" target="_blank">${data}</a>`;
-                }
-            },
-            {
-                data: 'Date',
-                className: 'date-column', // 이 줄 추가
-                render: function (data) {
-                    return `<span>${data}</span>`;
-                }
-            },
             { data: 'Title' },
             {
+                data: 'Date',
+                render: function(data) {
+                    if (!data) return '-';
+                    return '<span class="badge badge-light text-dark">' + String(data).substring(0, 10) + '</span>';
+                }
+            },
+            {
                 data: 'Content',
-                render: function (data) {
-                    if (data.length > 100) {
-                        const shortText = data.substring(0, 100) + '...';
-                        return `
-                            <div class="content-preview">
-                                <span class="short-text">${shortText}</span>
-                                <span class="full-text d-none">${data}</span>
-                                <button class="btn btn-link p-0 toggle-view">자세히 보기</button>
-                            </div>
-                        `;
+                render: function(data) {
+                    if (!data) return '-';
+                    if (data.length > 120) {
+                        var short = data.substring(0, 120) + '...';
+                        return '<div class="content-preview">'
+                             + '<span class="short-text">' + short + '</span>'
+                             + '<span class="full-text d-none">' + data + '</span>'
+                             + '<a href="#" class="toggle-view btn btn-link btn-sm p-0 ml-1">자세히</a>'
+                             + '</div>';
                     }
                     return data;
+                }
+            },
+            {
+                data: 'Link',
+                render: function(data) {
+                    if (!data) return '-';
+                    return '<a href="' + data + '" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">'
+                         + '<i class="fas fa-external-link-alt mr-1"></i>열기</a>';
                 }
             }
         ],
         order: [[1, 'desc']],
-        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        lengthMenu: [[10, 25, 50], [10, 25, 50]],
         pageLength: 10
     });
 
-    // "자세히 보기" 버튼 동작 처리 (기존 코드 유지)
-    $('#dataTable').on('click', '.toggle-view', function () {
-        const contentPreview = $(this).closest('.content-preview');
-        const shortText = contentPreview.find('.short-text');
-        const fullText = contentPreview.find('.full-text');
-
-        if (fullText.hasClass('d-none')) {
-            // 자세히 보기: 짧은 텍스트 숨기고 전체 텍스트 표시
-            shortText.addClass('d-none');
-            fullText.removeClass('d-none');
-            $(this).text('접기');
+    // 자세히/접기 토글
+    $('#dataTable').on('click', '.toggle-view', function(e) {
+        e.preventDefault();
+        var cp = $(this).closest('.content-preview');
+        var st = cp.find('.short-text');
+        var ft = cp.find('.full-text');
+        if (ft.hasClass('d-none')) {
+            st.addClass('d-none'); ft.removeClass('d-none'); $(this).text('접기');
         } else {
-            // 접기: 전체 텍스트 숨기고 짧은 텍스트 표시
-            shortText.removeClass('d-none');
-            fullText.addClass('d-none');
-            $(this).text('자세히 보기');
+            ft.addClass('d-none'); st.removeClass('d-none'); $(this).text('자세히');
         }
     });
-});
-</script>
 
-<!-- Page level custom scripts -->
-<script src="js/demo/datatables-demo.js"></script>
-<script>
-$('#updateButton').click(function(event) {
-    event.preventDefault();
-
-    // Show loading overlay
-    $('.loading-overlay').css({
-        'display': 'flex'
-    });
-
-    $.ajax({
-        url: '/run_script', // 서버 요청 URL
-        method: 'GET', // HTTP 요청 방식
-        success: function(response) {
-            alert('업데이트 완료되었습니다.'); // 성공 메시지
-            location.reload(); // 페이지 새로고침
-        },
-        error: function() {
-            alert('스크립트 실행 중 오류가 발생했습니다.');
-        },
-        complete: function() {
-            // Hide loading overlay
-            $('.loading-overlay').css({
-                'display': 'none'
-            }); 
-        }
+    // 기사 업데이트
+    $('#updateButton').on('click', function() {
+        $('#loadingOverlay').css('display', 'flex');
+        $.ajax({
+            url: '/run_script',
+            method: 'GET',
+            success: function() {
+                alert('뉴스 업데이트가 완료되었습니다.');
+                table.ajax.reload();
+            },
+            error: function() {
+                alert('업데이트 중 오류가 발생했습니다.');
+            },
+            complete: function() {
+                $('#loadingOverlay').hide();
+            }
+        });
     });
 });
 </script>
 </body>
-
 </html>

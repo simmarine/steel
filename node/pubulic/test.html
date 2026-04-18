@@ -1,402 +1,261 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title><dfn></dfn></title>
-
-    <!-- Custom fonts for this template-->
+    <title>SteelAI - AI 예측 성능</title>
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
-
-    <!-- Custom styles for this template-->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-
+    <link href="css/steelai.css" rel="stylesheet">
+    <style>
+        .accuracy-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .accuracy-high   { background: #d4edda; color: #155724; }
+        .accuracy-mid    { background: #fff3cd; color: #856404; }
+        .accuracy-low    { background: #f8d7da; color: #721c24; }
+        .nav-tabs .nav-link { font-weight: 600; }
+        .card-header .stat-info { font-size: .8rem; }
+    </style>
 </head>
 
 <body id="page-top">
+<div id="wrapper">
 
-    <!-- Page Wrapper -->
-    <div id="wrapper">
+    <!-- ── 사이드바 ──────────────────────────────────────────── -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <div class="sidebar-brand-icon">
+                <i class="fas fa-chart-line fa-lg"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">Steel<sup>AI</sup></div>
+        </a>
+        <hr class="sidebar-divider my-0">
 
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <li class="nav-item">
+            <a class="nav-link" href="index.html">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>대시보드</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider">
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-                <div class="sidebar-brand-icon">
-                    <img src="img/kisco_logo.png" alt="Kisco Logo" style="width: 40px; height: auto;">
+        <div class="sidebar-heading">분석</div>
+
+        <li class="nav-item active">
+            <a class="nav-link" href="test.html">
+                <i class="fas fa-fw fa-chart-bar"></i>
+                <span>AI 예측 성능</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="tables.html">
+                <i class="fas fa-fw fa-newspaper"></i>
+                <span>철강 뉴스</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider">
+
+        <div class="sidebar-heading">관리</div>
+
+        <li class="nav-item">
+            <a class="nav-link" href="craw.html">
+                <i class="fas fa-fw fa-database"></i>
+                <span>데이터 관리</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider d-none d-md-block">
+
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+    <!-- ── End Sidebar ─────────────────────────────────────── -->
+
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+
+            <!-- ── 상단 네비 ───────────────────────────────── -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <span class="navbar-brand font-weight-bold text-gray-700 ml-3 d-none d-sm-inline">
+                    AI 예측 성능
+                </span>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
+                           role="button" data-toggle="dropdown">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">관리자</span>
+                            <div class="img-profile rounded-circle bg-gradient-primary d-inline-flex align-items-center justify-content-center"
+                                 style="width:32px;height:32px;">
+                                <i class="fas fa-user text-white" style="font-size:.85rem;"></i>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="userDropdown">
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> 로그아웃
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- ── End 상단 네비 ─────────────────────────── -->
+
+            <!-- ── 본문 ───────────────────────────────────── -->
+            <div class="container-fluid">
+
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-chart-bar mr-2 text-primary"></i>AI 예측 성능 분석
+                    </h1>
+                    <small class="text-muted">Walk-Forward Validation 기준</small>
                 </div>
-                <div class="sidebar-brand-text mx-3">KISCO<sup>Steel</div>
-            </a>
 
-            <!-- Add this style in your CSS file or within a <style> tag -->
-            <style>
-                /* 이미지 크기 조절 */
-                .custom-logo {
-                    width: 50px; /* 원하는 너비 값으로 수정 */
-                    height: auto; /* 비율 유지 */
-                    transform: rotate(15deg); /* 이미지 회전 각도 조절 */
-                }
+                <!-- 탭 -->
+                <ul class="nav nav-tabs mb-3" id="predictionTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="market-price-tab" data-toggle="tab"
+                           href="#market-price-section" role="tab">
+                            <i class="fas fa-won-sign mr-1"></i> 시장 단가 예측
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="special-price-tab" data-toggle="tab"
+                           href="#special-price-section" role="tab">
+                            <i class="fas fa-tag mr-1"></i> 특별구매 단가 예측
+                        </a>
+                    </li>
+                </ul>
 
-                /* 필요에 따라 이미지 크기나 위치를 더 조절 */
-                .sidebar-brand-icon {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-            </style>
-            </a>
+                <div class="tab-content" id="predictionTabContent">
 
+                    <!-- 시장 단가 탭 -->
+                    <div class="tab-pane fade show active" id="market-price-section" role="tabpanel">
+                        <div class="row" id="marketPriceCharts"></div>
+                    </div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="index.html">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>HOME</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Interface
-            </div>
-
-
-            <!-- Nav Item - Charts -->
-            <!-- <li class="nav-item ">
-                <a class="nav-link" href="charts.html">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>단가 및 물동량 예측</span></a>
-            </li> -->
-
-            <!-- Nav Item - Charts -->
-            <li class="nav-item active">
-                <a class="nav-link" href="test.html">
-                    <i class="fas fa-fw fa-file"></i>
-                    <span>모델 성능 확인</span></a>
-            </li>
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>철강 뉴스</span></a>
-            </li>
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="craw.html">
-                    <i class="fa fa-upload" aria-hidden="true"></i>
-                    <span>데이터 추가</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
-
-        </ul>
-        <!-- End of Sidebar -->
-
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-
-            <!-- Main Content -->
-            <div id="content">
-
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
-
-                    <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-search fa-fw"></i>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-                                            placeholder="Search for..." aria-label="Search"
-                                            aria-describedby="basic-addon2">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </li>
-
-                        <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">3+</span>
-                            </a>
-                            <!-- Dropdown - Alerts -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">
-                                    Alerts Center
-                                </h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2024</div>
-                                        <span class="font-weight-bold">금일 뉴스 스크랩 업데이트</span>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2024</div>
-                                        철강 단가 예측 업데이트
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2024</div>
-                                        데이터 업데이트 필요
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
-                            </div>
-                        </li>
-
-                        
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">관리자 계정</span>
-                                <img class="img-profile rounded-circle"
-                                    src="img/undraw_profile.svg">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </li>
-
-                    </ul>
-
-                </nav>
-                
-                <!-- End of Topbar -->
-
-                <div class="container-fluid">
-                    <!-- 탭 메뉴 -->
-                    <ul class="nav nav-tabs" id="predictionTabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="market-price-tab" data-toggle="tab" href="#market-price-section" role="tab" aria-controls="market-price-section" aria-selected="true">시장 단가 예측</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="special-price-tab" data-toggle="tab" href="#special-price-section" role="tab" aria-controls="special-price-section" aria-selected="false">특별 구매 단가 예측</a>
-                        </li>
-                    </ul>
-                
-                    <!-- 탭 콘텐츠 -->
-                    <div class="tab-content" id="predictionTabContent">
-                        <!-- 시장 단가 예측 섹션 -->
-                        <div class="tab-pane fade show active" id="market-price-section" role="tabpanel" aria-labelledby="market-price-tab">
-                            <!-- <h1 class="h3 mb-4 text-gray-800">시장 단가 예측</h1> -->
-                            <div class="row">
-                                <script>
-                                    const predictionDays = [10, 20, 30, 45, 60]; // 예측 일수 배열
-                                    const modelAccuracies = [99.53, 96.23, 88.56, 83.63, 88.50]; // 모델 성능 (accuracy 값)                                    
-                                    const all =[213,212,201,226,226];
-                                    const pred_true =[212,204,178,189,220];
-
-                                    for (let i = 0; i < predictionDays.length; i++) { // 2_00 모델 5개
-                                        document.write(`
-                                            <div class="col-md-12">
-                                                <div class="card shadow mb-4">
-                                                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                                        <h6 class="m-0 font-weight-bold text-primary">${predictionDays[i]}일 뒤 예측</h6>
-                                                        <div class="text-right font-weight-bold text-success">
-                                                            정답 데이터${pred_true[i]}개 / 전체 데이터${all[i]}개, Accuracy : ${modelAccuracies[i]}%
-                                                        </div>
-                                                        <div id="loadingSpinner${i}" style="display: none;">Loading...</div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="chart-area">
-                                                            <canvas id="chart${i}"></canvas>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        `);
-                                    }
-                                </script>
-                            </div>
-                        </div>
-                
-                        <!-- 특별 구매 단가 예측 섹션 -->
-                        <div class="tab-pane fade" id="special-price-section" role="tabpanel" aria-labelledby="special-price-tab">
-                            <!-- <h1 class="h3 mb-4 text-gray-800">특별 구매 단가 예측</h1> -->
-                            <div class="row">
-                                <script>
-                                    for (let i = 0; i < predictionDays.length; i++) { // 4_00 모델 5개
-                                        const chartIndex = i + predictionDays.length; // 차트 ID는 5~9
-                                        const modelAccuracies2 = [93.95, 89.60, 93.36, 84.75, 94.32]; // 모델 성능 (accuracy 값)
-                                        const all2 =[215,202,211,223,229];
-                                        const pred_true2 =[202,181,197,189,216];
-                            
-                                        document.write(`
-                                            <div class="col-md-12">
-                                                <div class="card shadow mb-4">
-                                                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                                        <h6 class="m-0 font-weight-bold text-primary">${predictionDays[i]}일 뒤 예측</h6>
-                                                        <div class="text-right font-weight-bold text-success">
-                                                            정답 데이터${pred_true2[i]}개 / 전체 데이터${all2[i]}개, Accuracy : ${modelAccuracies2[i]}%
-                                                        </div>
-                                                        <div id="loadingSpinner${chartIndex}" style="display: none;">Loading...</div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="chart-area">
-                                                            <canvas id="chart${chartIndex}"></canvas>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        `);
-                                    }
-                                </script>
-                            </div>
-                        </div>
+                    <!-- 특별구매 단가 탭 -->
+                    <div class="tab-pane fade" id="special-price-section" role="tabpanel">
+                        <div class="row" id="specialPriceCharts"></div>
                     </div>
                 </div>
+
             </div>
+            <!-- ── End 본문 ──────────────────────────────── -->
+
         </div>
-            <!-- /.container-fluid -->
 
-            </div>
-            <!-- End of Main Content -->
-
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; kisco_steel 2024</span>
-                    </div>
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; SteelAI 2025</span>
                 </div>
-            </footer>
-            <!-- End of Footer -->
-
-        </div>
-        <!-- End of Content Wrapper -->
-
+            </div>
+        </footer>
     </div>
-    <!-- End of Page Wrapper -->
+</div>
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">로그아웃</h5>
+                <button class="close" type="button" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">현재 세션을 종료하시겠습니까?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">취소</button>
+                <a class="btn btn-primary" href="index.html">로그아웃</a>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="vendor/chart.js/Chart.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script>
+// ── 모델 성능 데이터 ─────────────────────────────────────────
+var MARKET_DATA = {
+    days:       [10,   20,   30,   45,   60],
+    accuracy:   [99.53, 96.23, 88.56, 83.63, 88.50],
+    total:      [213,  212,  201,  226,  226],
+    correct:    [212,  204,  178,  189,  220]
+};
 
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
+var SPECIAL_DATA = {
+    days:       [10,   20,   30,   45,   60],
+    accuracy:   [93.95, 89.60, 93.36, 84.75, 94.32],
+    total:      [215,  202,  211,  223,  229],
+    correct:    [202,  181,  197,  189,  216]
+};
 
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
+function getAccuracyClass(acc) {
+    if (acc >= 90) return 'accuracy-high';
+    if (acc >= 80) return 'accuracy-mid';
+    return 'accuracy-low';
+}
 
-    <!-- Page level custom scripts -->
-    <script src="js/demo/test.js"></script>
-    <!-- <script src="js/demo/calender.js"></script> -->
+function buildChartCards(containerId, data, chartIdPrefix) {
+    var container = document.getElementById(containerId);
+    data.days.forEach(function(day, i) {
+        var acc     = data.accuracy[i];
+        var total   = data.total[i];
+        var correct = data.correct[i];
+        var cls     = getAccuracyClass(acc);
+        var chartId = chartIdPrefix + i;
 
-    <script src="js/demo/chart-pie-demo.js"></script>
-    <script src="js/demo/chart-bar-demo.js"></script>
-    <script src="js/demo/chart-area2-demo.js"></script>
+        var html = '<div class="col-md-12 mb-4">'
+            + '<div class="card shadow">'
+            + '<div class="card-header py-3 d-flex justify-content-between align-items-center">'
+            + '<h6 class="m-0 font-weight-bold text-primary">'
+            + '<i class="fas fa-clock mr-1"></i>' + day + '일 후 예측'
+            + '</h6>'
+            + '<div class="d-flex align-items-center stat-info">'
+            + '<span class="mr-3 text-muted">'
+            + '정답 <strong>' + correct + '</strong> / 전체 <strong>' + total + '</strong>'
+            + '</span>'
+            + '<span class="accuracy-badge ' + cls + '">Acc ' + acc + '%</span>'
+            + '</div>'
+            + '</div>'
+            + '<div class="card-body">'
+            + '<div class="chart-area"><canvas id="' + chartId + '"></canvas></div>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
 
+        container.insertAdjacentHTML('beforeend', html);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    buildChartCards('marketPriceCharts',  MARKET_DATA,  'chart');
+    buildChartCards('specialPriceCharts', SPECIAL_DATA, 'chart');
+});
+</script>
+
+<script src="js/demo/test.js"></script>
+<script src="js/demo/chart-pie-demo.js"></script>
+<script src="js/demo/chart-bar-demo.js"></script>
+<script src="js/demo/chart-area2-demo.js"></script>
 </body>
-
 </html>

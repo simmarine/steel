@@ -1,235 +1,296 @@
-import pandas as pd
-import numpy as np
-import joblib
-import pickle
+"""
+predict.py
+모든 버전(2_10 ~ 4_60) 예측 처리 모듈.
+
+변경 이력:
+  - DB 연동: 데이터 로드 → steel_prices + steel_features
+             예측 결과 저장 → predictions 테이블 (+ excel2/ fallback 유지)
+"""
 import os
+import pickle
+from pathlib import Path
 
-DATA_FILE = r'.\data\data_2024_11.xlsx'          # 2_**용 기본파일
-DATA_FILE_SPECIAL = r'.\data\data_2024_11_특.xlsx'  # 4_**용 기본파일
+import joblib
+import numpy as np
+import pandas as pd
+from sqlalchemy import text
 
-def save_or_update_excel(new_data, output_file):
-    if os.path.exists(output_file):
-        existing_data = pd.read_excel(output_file, engine='openpyxl')
+from crawlers.base import get_engine
+
+# ── 경로 ─────────────────────────────────────────────────────
+BASE_DIR     = Path(__file__).parent
+FEATURES_DIR = BASE_DIR / 'features'
+SCALER_DIR   = BASE_DIR / 'scaler'
+PICKLE_DIR   = BASE_DIR / 'pickle'
+LABELS_DIR   = BASE_DIR / 'labels'
+EXCEL2_DIR   = BASE_DIR / 'excel2'
+
+# ── DB ───────────────────────────────────────────────────────
+_engine = get_engine()
+
+
+# ── DB 데이터 로드 ────────────────────────────────────────────
+def _load_wide_data() -> pd.DataFrame:
+    """steel_prices + steel_features → wide DataFrame (일자 컬럼 포함)"""
+    prices = pd.read_sql("""
+        SELECT
+            date             AS 일자,
+            price_standard   AS `중A`,
+            price_special    AS `중A_특`,
+            volume_incoming  AS 입고량,
+            volume_stock     AS 재고량,
+            volume_rate      AS 입고율,
+            steel_production AS 제강생산량,
+            scrap_input      AS 고철투입량
+        FROM steel_prices
+        ORDER BY date
+    """, _engine)
+    prices['일자'] = pd.to_datetime(prices['일자'])
+
+    features = pd.read_sql(
+        "SELECT date AS 일자, feature_name, value FROM steel_features", _engine
+    )
+    if features.empty:
+        return prices
+
+    features['일자'] = pd.to_datetime(features['일자'])
+    wide = features.pivot(index='일자', columns='feature_name', values='value').reset_index()
+    wide.columns.name = None
+    return pd.merge(prices, wide, on='일자', how='left')
+
+
+# ── predictions 테이블 UPSERT ─────────────────────────────────
+def _upsert_predictions(new_z_df: pd.DataFrame, model_type: int, horizon: int):
+    """new_z_df(일자=목표날짜, pred=예측값)를 predictions 테이블에 저장"""
+    rows = []
+    for _, row in new_z_df.iterrows():
+        target_dt = pd.to_datetime(row['일자'])
+        base_date = (target_dt - pd.Timedelta(days=horizon)).date()
+        rows.append({
+            'base_date':       base_date,
+            'model_type':      model_type,
+            'horizon':         horizon,
+            'predicted_value': float(row['pred']),
+        })
+    if not rows:
+        return
+    with _engine.connect() as conn:
+        conn.execute(text("""
+            INSERT INTO predictions (base_date, model_type, horizon, predicted_value)
+            VALUES (:base_date, :model_type, :horizon, :predicted_value)
+            ON DUPLICATE KEY UPDATE predicted_value = VALUES(predicted_value)
+        """), rows)
+        conn.commit()
+
+
+# ── excel2/ 저장 (fallback / 하위호환) ───────────────────────
+def _save_excel2(df: pd.DataFrame, version: str):
+    """예측 결과를 excel2/{version}.xlsx에도 저장 (get-chart-data 등 하위호환)"""
+    EXCEL2_DIR.mkdir(exist_ok=True)
+    output_file = EXCEL2_DIR / f"{version}.xlsx"
+
+    if output_file.exists():
+        existing = pd.read_excel(output_file, engine='openpyxl')
+        existing['일자'] = pd.to_datetime(existing['일자'], errors='coerce')
+        df['일자']       = pd.to_datetime(df['일자'],       errors='coerce')
+        merged = pd.merge(existing, df, on='일자', how='outer', suffixes=('_old', '_new'))
+        if 'pred_new' in merged.columns and 'pred_old' in merged.columns:
+            merged['pred'] = merged['pred_new'].combine_first(merged['pred_old'])
+            merged.drop(columns=['pred_old', 'pred_new'], inplace=True)
+        merged.sort_values(by='일자', inplace=True)
+        merged.to_excel(output_file, index=False, engine='openpyxl')
     else:
-        existing_data = pd.DataFrame()
-
-    if '일자' not in new_data.columns:
-        print("New data has no '일자' column.")
-        return output_file
-
-    existing_data['일자'] = pd.to_datetime(existing_data['일자'], errors='coerce')
-    new_data['일자'] = pd.to_datetime(new_data['일자'], errors='coerce')
-
-    merged = pd.merge(existing_data, new_data, on='일자', how='outer', suffixes=('_old', '_new'))
-
-    new_cols = [c for c in new_data.columns if c != '일자']
-    for c in new_cols:
-        c_new = c + '_new'
-        c_old = c + '_old'
-        if c_new in merged.columns and c_old in merged.columns:
-            merged[c] = merged[c_new].combine_first(merged[c_old])
-            merged.drop(columns=[c_old, c_new], inplace=True)
-        elif c_new in merged.columns:
-            merged.rename(columns={c_new: c}, inplace=True)
-        elif c_old in merged.columns:
-            merged.rename(columns={c_old: c}, inplace=True)
-
-    for c in merged.columns:
-        if c.endswith('_old') and c[:-4] not in merged.columns:
-            merged.rename(columns={c: c[:-4]}, inplace=True)
-
-    merged.sort_values(by='일자', inplace=True)
-
-    merged.to_excel(output_file, index=False, engine='openpyxl')
-    return output_file
+        df.to_excel(output_file, index=False, engine='openpyxl')
 
 
-def compare_and_update_special_price(price_version, special_price_version, new_dates):
-    """
-    특정 날짜에 대해 단가와 특구가 예측 데이터를 비교하여 특구가가 단가보다 낮은 경우 업데이트.
+# ── 예측 비교 (특구가 ≥ 단가 보정) ───────────────────────────
+def compare_and_update_special_price(
+    price_version: str, special_price_version: str, new_dates: list
+):
+    """특구가 예측값이 단가 예측값보다 낮으면 단가 예측값으로 덮어씀 (DB 기준)"""
+    price_type   = int(price_version.split('_')[0])
+    special_type = int(special_price_version.split('_')[0])
+    horizon      = int(price_version.split('_')[1])
 
-    Args:
-        price_version (str): 단가 모델 키 (예: "2_10").
-        special_price_version (str): 특구가 모델 키 (예: "4_10").
-        new_dates (list): 업데이트 날짜 리스트.
-    """
-    price_file_path = os.path.join('excel2', f"{price_version}.xlsx")
-    special_price_file_path = os.path.join('excel2', f"{special_price_version}.xlsx")
-
-    if not os.path.exists(price_file_path) or not os.path.exists(special_price_file_path):
-        print(f"File not found for {price_version} or {special_price_version}")
+    if not new_dates:
         return
 
-    price_df = pd.read_excel(price_file_path)
-    special_price_df = pd.read_excel(special_price_file_path)
+    base_dates = set(
+        (pd.to_datetime(d) - pd.Timedelta(days=horizon)).date() for d in new_dates
+    )
 
-    # '일자'와 'pred' 컬럼이 있는지 확인
-    if '일자' not in price_df.columns or 'pred' not in price_df.columns:
-        print(f"'일자' or 'pred' column missing in {price_file_path}")
-        return
-    if '일자' not in special_price_df.columns or 'pred' not in special_price_df.columns:
-        print(f"'일자' or 'pred' column missing in {special_price_file_path}")
-        return
+    # int 리터럴로 쿼리 구성 (SQL injection 위험 없음)
+    price_df = pd.read_sql(
+        f"SELECT base_date, predicted_value FROM predictions "
+        f"WHERE model_type = {price_type} AND horizon = {horizon}",
+        _engine,
+    )
+    special_df = pd.read_sql(
+        f"SELECT base_date, predicted_value FROM predictions "
+        f"WHERE model_type = {special_type} AND horizon = {horizon}",
+        _engine,
+    )
 
-    # 날짜 기준으로 병합
-    price_df['일자'] = pd.to_datetime(price_df['일자'])
-    special_price_df['일자'] = pd.to_datetime(special_price_df['일자'])
-    merged = pd.merge(price_df, special_price_df, on='일자', suffixes=('_price', '_special'))
-
-    # 새로 추가된 날짜 데이터 필터링
-    merged_new = merged[merged['일자'].isin(new_dates)]
-
-    if merged_new.empty:
-        print(f"No new data to update for {special_price_version}")
+    if price_df.empty or special_df.empty:
         return
 
-    # 특구가가 단가보다 낮은 경우 업데이트
-    special_price_updated = merged_new['pred_special'] < merged_new['pred_price']
-    merged_new.loc[special_price_updated, 'pred_special'] = merged_new.loc[special_price_updated, 'pred_price']
+    price_df['base_date']   = pd.to_datetime(price_df['base_date']).dt.date
+    special_df['base_date'] = pd.to_datetime(special_df['base_date']).dt.date
 
-    # 업데이트된 특구가 저장
-    updated_special_price_df = merged_new[['일자', 'pred_special']].rename(columns={'pred_special': 'pred'})
-    save_or_update_excel(updated_special_price_df, special_price_file_path)
+    price_df   = price_df[price_df['base_date'].isin(base_dates)]
+    special_df = special_df[special_df['base_date'].isin(base_dates)]
 
-    print(f"Updated special prices for {special_price_version} on new dates only.")
+    price_map   = dict(zip(price_df['base_date'],   price_df['predicted_value']))
+    special_map = dict(zip(special_df['base_date'], special_df['predicted_value']))
 
-def process_version(version):
-    version_params = {
-        "2_10": {"w": 100, "h": 10, "window_size": 60, "diff_size": 200},
-        "2_20": {"w": 100, "h": 20, "window_size": 50, "diff_size": 200},
-        "2_30": {"w": 200, "h": 30, "window_size": 5, "diff_size": 200},
-        "2_45": {"w": 100, "h": 45, "window_size": 30, "diff_size": 40},
-        "2_60": {"w": 80,  "h": 60, "window_size": 30, "diff_size": 40},
-        "4_10": {"w": 200, "h": 10, "window_size": 50, "diff_size": 80},
-        "4_20": {"w": 200, "h": 20, "window_size": 50, "diff_size": 200},
-        "4_30": {"w": 200, "h": 30, "window_size": 40, "diff_size": 100},
-        "4_45": {"w": 100, "h": 45, "window_size": 40, "diff_size": 70},
-        "4_60": {"w": 80,  "h": 60, "window_size": 30, "diff_size": 10}
-    }
+    update_rows = []
+    for bd, sp_val in special_map.items():
+        p_val = price_map.get(bd)
+        if p_val is not None and sp_val < p_val:
+            update_rows.append({
+                'base_date':       bd,
+                'model_type':      special_type,
+                'horizon':         horizon,
+                'predicted_value': float(p_val),
+            })
 
-    params = version_params.get(version, {"w": 100, "h": 10, "window_size": 60, "diff_size": 200})
-    w = params["w"]
-    h = params["h"]
+    if not update_rows:
+        return
+
+    with _engine.connect() as conn:
+        conn.execute(text("""
+            INSERT INTO predictions (base_date, model_type, horizon, predicted_value)
+            VALUES (:base_date, :model_type, :horizon, :predicted_value)
+            ON DUPLICATE KEY UPDATE predicted_value = VALUES(predicted_value)
+        """), update_rows)
+        conn.commit()
+
+    print(f"Updated {len(update_rows)} special price rows for {special_price_version}")
+
+
+# ── 단일 버전 처리 ─────────────────────────────────────────────
+_VERSION_PARAMS = {
+    "2_10": {"w": 100, "h": 10,  "window_size": 60,  "diff_size": 200},
+    "2_20": {"w": 100, "h": 20,  "window_size": 50,  "diff_size": 200},
+    "2_30": {"w": 200, "h": 30,  "window_size": 5,   "diff_size": 200},
+    "2_45": {"w": 100, "h": 45,  "window_size": 30,  "diff_size": 40},
+    "2_60": {"w": 80,  "h": 60,  "window_size": 30,  "diff_size": 40},
+    "4_10": {"w": 200, "h": 10,  "window_size": 50,  "diff_size": 80},
+    "4_20": {"w": 200, "h": 20,  "window_size": 50,  "diff_size": 200},
+    "4_30": {"w": 200, "h": 30,  "window_size": 40,  "diff_size": 100},
+    "4_45": {"w": 100, "h": 45,  "window_size": 40,  "diff_size": 70},
+    "4_60": {"w": 80,  "h": 60,  "window_size": 30,  "diff_size": 10},
+}
+
+
+def process_version(version: str) -> pd.DataFrame:
+    params      = _VERSION_PARAMS.get(version, {"w": 100, "h": 10, "window_size": 60, "diff_size": 200})
+    w           = params["w"]
+    h           = params["h"]
     window_size = params["window_size"]
-    diff_size = params["diff_size"]
+    diff_size   = params["diff_size"]
+    model_type  = int(version.split('_')[0])
 
-    if version.startswith('2_'):
-        file_path = DATA_FILE
-        target_col = '중A'
-    else:
-        file_path = DATA_FILE_SPECIAL
-        target_col = '중A_특'
+    target_col = '중A' if version.startswith('2_') else '중A_특'
 
-    # 먼저 data 로드
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Data file not found: {file_path}")
+    # ── 데이터 로드 (DB → fallback Excel) ────────────────────
+    try:
+        data = _load_wide_data()
+        if data.empty:
+            raise ValueError("DB 데이터 없음")
+    except Exception as e:
+        print(f"[DB 로드 실패, Excel fallback] {e}")
+        fb_file = BASE_DIR / 'data' / (
+            'data_2024_11.xlsx' if version.startswith('2_') else 'data_2024_11_특.xlsx'
+        )
+        if not fb_file.exists():
+            raise FileNotFoundError(f"Fallback file not found: {fb_file}")
+        data = pd.read_excel(fb_file)
 
-    data = pd.read_excel(file_path)
-    if data.empty:
-        raise ValueError(f"Data is empty for version {version}")
-
-    # train_features 로드 및 컬럼 재정렬
-    print(f"Loading train features for version: {version}")
-    train_features_path = f'features/train_features({version}).csv'
-    if not os.path.exists(train_features_path):
-        raise FileNotFoundError(f"Train features file not found for version: {version}")
-
-    train_df = pd.read_csv(train_features_path)
-    train_features_list = train_df['Feature'].tolist()
-    print("Train features list loaded:", train_features_list)
-
-    # target_col과 일자 컬럼이 데이터에 존재하는지 체크
     if '일자' not in data.columns:
-        raise ValueError(f"'일자' column not found in {file_path} for version {version}")
+        raise ValueError(f"'일자' column not found in data for {version}")
     if target_col not in data.columns:
-        raise ValueError(f"'{target_col}' column not found in {file_path} for version {version}")
+        raise ValueError(f"'{target_col}' column not found in data for {version}")
 
-    # missing_cols 체크 (train_features에 없는 컬럼은 무시)
+    # ── 피처 로드 ─────────────────────────────────────────────
+    train_features_path = FEATURES_DIR / f'train_features({version}).csv'
+    if not train_features_path.exists():
+        raise FileNotFoundError(f"Train features file not found: {train_features_path}")
+
+    train_features_list = pd.read_csv(train_features_path)['Feature'].tolist()
+
     missing_cols = set(train_features_list) - set(data.columns)
     if missing_cols:
-        raise ValueError(f"Missing columns in data for version {version}: {missing_cols}")
+        raise ValueError(f"Missing columns for {version}: {missing_cols}")
 
-    # data_x: 학습했던 피처들만
     data_x = data[train_features_list]
-
-    # data_z: 일자와 target_col만
     data_z = data[['일자', target_col]]
 
-    # ewm, diff 적용 후 index alignment
+    # ── 전처리 ────────────────────────────────────────────────
     data_x = data_x.ewm(window_size).mean()
     data_x = data_x.diff(diff_size)
     data_x.dropna(inplace=True)
-    # data_z도 data_x와 인덱스 맞춤
     data_z = data_z.loc[data_x.index]
 
-    scaler_x = joblib.load(f'scaler/scaler_x({version}).pkl')
+    # ── 스케일러 + 모델 로드 ──────────────────────────────────
+    scaler_path = SCALER_DIR / f'scaler_x({version}).pkl'
+    model_path  = PICKLE_DIR / f'xgboost_model({version}).pkl'
+
+    scaler_x = joblib.load(scaler_path)
     new_x_data = scaler_x.transform(data_x)
 
-    new_x = []
-    new_z = []
+    new_x, new_z = [], []
     for i in range(len(new_x_data) - w + 1):
-        x = new_x_data[i:i + w]
-        z = data_z.iloc[i + w - 1].values
-        new_x.append(x)
-        new_z.append(z)
+        new_x.append(new_x_data[i:i + w])
+        new_z.append(data_z.iloc[i + w - 1].values)
+
     new_x = np.array(new_x)
     new_z = np.array(new_z)
 
-    columns = data_z.columns
-    new_z_df = pd.DataFrame(new_z, columns=columns)
+    with open(model_path, 'rb') as mf:
+        model = pickle.load(mf)
 
-    with open(f'pickle/xgboost_model({version}).pkl', 'rb') as model_file:
-        model = pickle.load(model_file)
+    raw_preds = model.predict(new_x.reshape(new_x.shape[0], -1))
 
-    new_x_reshaped = new_x.reshape(new_x.shape[0], -1)
-    predictions = model.predict(new_x_reshaped)
+    label_encoder = joblib.load(LABELS_DIR / f'label_encoder({version}).pkl')
+    pred_labels   = label_encoder.inverse_transform(raw_preds)
 
-    label_encoder = joblib.load(f'labels/label_encoder({version}).pkl')
-    pred_labels = label_encoder.inverse_transform(predictions)
-
-    df = pd.DataFrame()
-    df['pred'] = pred_labels
-
-    new_z_df['pred'] = new_z_df[target_col] + df['pred'].values
-    new_z_df['일자'] = pd.to_datetime(new_z_df['일자'])
-    new_z_df['일자'] = new_z_df['일자'] + pd.Timedelta(days=h)
+    new_z_df = pd.DataFrame(new_z, columns=['일자', target_col])
+    new_z_df['pred'] = new_z_df[target_col] + pred_labels
+    new_z_df['일자'] = pd.to_datetime(new_z_df['일자']) + pd.Timedelta(days=h)
     new_z_df = new_z_df.drop(columns=[target_col])
 
-    # 2_20 모델일 경우 예측값에 +10
+    # 2_20 보정
     if version == "2_20":
         new_z_df['pred'] = new_z_df['pred'] + 10
 
-    output_file = f"excel2/{version}.xlsx"
-    if not os.path.exists('excel2'):
-        os.makedirs('excel2')
+    # ── 결과 저장 ─────────────────────────────────────────────
+    _upsert_predictions(new_z_df, model_type=model_type, horizon=h)
+    _save_excel2(new_z_df, version)
 
-    save_or_update_excel(new_z_df, output_file)
-
-    # ★ 여기서 예측 결과 DataFrame(new_z_df)을 반환하도록 함 ★
+    print(f"[{version}] {len(new_z_df)}행 예측 완료 → DB + excel2 저장")
     return new_z_df
 
 
+# ── 전체 버전 처리 ─────────────────────────────────────────────
 def process_all_versions():
-    price_versions = ["2_10", "2_20", "2_30", "2_45", "2_60"]
+    price_versions         = ["2_10", "2_20", "2_30", "2_45", "2_60"]
     special_price_versions = ["4_10", "4_20", "4_30", "4_45", "4_60"]
 
-    new_dates = []  # 업데이트된 새로운 날짜를 추적하기 위한 리스트
+    new_dates = []
 
-    for price_version, special_price_version in zip(price_versions, special_price_versions):
-        # 단가 및 특구가 각각 처리 (각각의 예측 결과 DataFrame을 반환받음)
-        price_data = process_version(price_version)
-        special_price_data = process_version(special_price_version)
+    for price_ver, special_ver in zip(price_versions, special_price_versions):
+        price_data   = process_version(price_ver)
+        special_data = process_version(special_ver)
 
-        # 예측 결과 DataFrame에서 '일자' 컬럼이 있는지 확인 후, 새로운 날짜 저장
         if price_data is not None and '일자' in price_data.columns:
             new_dates += price_data['일자'].tolist()
         else:
-            print(f"Warning: No '일자' data for version {price_version}")
+            print(f"Warning: No '일자' data for {price_ver}")
 
-        # 단가와 특구가 비교 및 업데이트
-        compare_and_update_special_price(price_version, special_price_version, new_dates)
+        compare_and_update_special_price(price_ver, special_ver, new_dates)
+        print(f"Processed: {price_ver} & {special_ver}")
 
-        print(f"Processed and compared versions: {price_version} & {special_price_version}")
 
 if __name__ == "__main__":
     process_all_versions()

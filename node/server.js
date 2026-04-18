@@ -1,14 +1,16 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const path = require('path');
 const app = express();
 const { exec } = require('child_process');
-const port = 8080;
+const port = parseInt(process.env.NODE_PORT) || 8080;
+const host = process.env.NODE_HOST || '0.0.0.0';
 
 // CORS 옵션 세부 설정
 const corsOptions = {
-  origin: '*',
+  origin: process.env.CORS_ORIGIN || '*',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
@@ -17,45 +19,56 @@ app.use(cors(corsOptions));
 // JSON 파싱 미들웨어 추가
 app.use(express.json());
 
-// 정적 파일 서빙 미들웨어 추가 (HTML, CSS, JS 등)
-app.use(express.static(path.join(__dirname, 'public')));
+// 프론트엔드에 API 설정을 동적으로 주입하는 config.js 엔드포인트
+app.get('/js/config.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.send(`
+const API_CONFIG = {
+  FLASK_API: '${process.env.FLASK_API_URL || 'http://localhost:5050'}',
+  NODE_API: ''
+};
+`);
+});
 
-// 데이터베이스 연결 풀 사용 (권장)
+// 정적 파일 서빙 미들웨어 추가 (HTML, CSS, JS 등)
+app.use(express.static(path.join(__dirname, 'pubulic')));
+
+// 데이터베이스 연결 풀 사용 (환경변수에서 로드)
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'bigdata1!',
-  database: 'db',
-  connectionLimit: 40
+  host: process.env.MYSQL_HOST || 'localhost',
+  user: process.env.MYSQL_USER || 'root',
+  password: process.env.MYSQL_PASSWORD || '',
+  database: process.env.MYSQL_DATABASE || 'db',
+  connectionLimit: parseInt(process.env.MYSQL_CONNECTION_LIMIT) || 40
 });
 
 // HTML 라우트 추가
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'pubulic', 'index.html'));
 });
 
 app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'pubulic', 'index.html'));
 });
 
 app.get('/chart.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'chart.html'));
+  res.sendFile(path.join(__dirname, 'pubulic', 'chart.html'));
 });
 
 app.get('/tables.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'tables.html'));
+  res.sendFile(path.join(__dirname, 'pubulic', 'tables.html'));
 });
 
 app.get('/tables_copy.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'tables_copy.html'));
+  res.sendFile(path.join(__dirname, 'pubulic', 'tables_copy.html'));
 });
 
 app.get('/test.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'test.html'));
+  res.sendFile(path.join(__dirname, 'pubulic', 'test.html'));
 });
 
 app.get('/craw.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'craw.html'));
+  res.sendFile(path.join(__dirname, 'pubulic', 'craw.html'));
 });
 
 app.get('/run_script', (req, res) => {
@@ -251,8 +264,8 @@ app.use((err, req, res, next) => {
 });
 
 // 서버 시작
-app.listen(port, '203.253.181.161', () => {
-  console.log(`서버가 http://203.253.181.161:${port}에서 실행 중`);
+app.listen(port, host, () => {
+  console.log(`서버가 http://${host}:${port}에서 실행 중`);
 });
 
 // 프로세스 전역 예외 처리

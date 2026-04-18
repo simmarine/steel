@@ -3,7 +3,12 @@ import os
 import sys
 import json
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from selenium import webdriver
+
+load_dotenv()
+STEELDAILY_ID = os.getenv('STEELDAILY_ID', '')
+STEELDAILY_PW = os.getenv('STEELDAILY_PW', '')
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -119,9 +124,9 @@ def login(driver):
     )
     
     user_id_field.clear()
-    user_id_field.send_keys('bigdata2024')
+    user_id_field.send_keys(STEELDAILY_ID)
     user_pw_field.clear()
-    user_pw_field.send_keys('bigdata1!')
+    user_pw_field.send_keys(STEELDAILY_PW)
     
     loginpage_button_xpath = '//*[@class="button expanded large user-bg mary-25"]'
     WebDriverWait(driver, 10).until(

@@ -1,7 +1,12 @@
 import time
 import os
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from selenium import webdriver
+
+load_dotenv()
+STEELIN_ID = os.getenv('STEELIN_ID', '')
+STEELIN_PW = os.getenv('STEELIN_PW', '')
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -113,9 +118,9 @@ def login(driver):
     )
     
     user_id_field.clear()
-    user_id_field.send_keys('bigdata2024')
+    user_id_field.send_keys(STEELIN_ID)
     user_pw_field.clear()
-    user_pw_field.send_keys('bigdata1!')
+    user_pw_field.send_keys(STEELIN_PW)
     
     loginpage_button_xpath = '//*[@class="button expanded large user-bg"]'
     WebDriverWait(driver, 20).until(
