@@ -36,6 +36,9 @@ npm-debug.log*
 *.pkl
 flask/binary_models/
 flask/binary_scaler/
+flask/pickle/
+flask/scaler/
+flask/labels/
 
 # 원본 데이터 / 피처 목록 (민감정보)
 *.xlsx
@@ -43,14 +46,14 @@ flask/data/
 flask/excel/
 flask/excel2/
 flask/features/
-flask/labels/
 flask/test_results/
 flask/time.txt
 flask/binary_features/
 
-# 분석 출력물 중 피처명 포함 파일
+# 분석 출력물 (피처명 포함 또는 대외비 내용)
 analysis/outputs/final_features.csv
 analysis/outputs/*.csv
+analysis/outputs/*.pptx
 
 # 데이터베이스 관련 (대외비)
 database/
