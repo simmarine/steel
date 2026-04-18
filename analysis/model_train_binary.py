@@ -6,7 +6,7 @@ model_train_binary.py — 원본 피처 복원 + 이진 분류 최종 모델 학
   2. DB에 컬럼이 존재하고 실제 데이터가 있는 피처만 사용
      - DB에 없는 피처 → 제외
      - DB에 있으나 결측률 >= NULL_THRESHOLD → 데이터 없는 것으로 판단, 제외
-     - (예: 남부권 컬럼은 있지만 데이터 없으면 자동 제외)
+     - (예: 특정 컬럼은 있지만 데이터 없으면 자동 제외)
   3. lag/rolling/directional 피처는 항상 포함
   4. 최종 피처로 10/30/60일 모델 재학습
 
@@ -43,7 +43,7 @@ for d in [BINARY_MODELS_DIR, BINARY_SCALER_DIR, BINARY_FEATURES_DIR]:
 
 from utils import load_data  # noqa: E402
 
-TARGET       = '중A'
+TARGET       = 'price_standard'
 HORIZONS     = [10, 30, 60]
 NULL_THRESHOLD = 0.80   # 결측률 이 이상이면 "데이터 없음"으로 판단
 

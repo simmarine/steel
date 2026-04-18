@@ -143,13 +143,13 @@ volume_models,        volume_features        = load_models_and_features(volume_m
 _PRICES_QUERY = """
     SELECT
         date             AS 일자,
-        price_standard   AS 중A,
-        price_special    AS `중A_특`,
-        volume_incoming  AS 입고량,
-        volume_stock     AS 재고량,
-        volume_rate      AS 입고율,
-        steel_production AS 제강생산량,
-        scrap_input      AS 고철투입량
+        price_standard,
+        price_special,
+        volume_incoming,
+        volume_stock,
+        volume_rate,
+        steel_production,
+        scrap_input
     FROM steel_prices
     ORDER BY date
 """
@@ -185,8 +185,8 @@ def _load_main_data() -> pd.DataFrame:
 def _startup_load():
     try:
         raw = _load_main_data()
-        d       = raw.drop(columns=['중A_특'], errors='ignore').copy()
-        d_spec  = raw.drop(columns=['중A'],    errors='ignore').copy()
+        d       = raw.drop(columns=['price_special'], errors='ignore').copy()
+        d_spec  = raw.drop(columns=['price_standard'], errors='ignore').copy()
 
         # price_features에 필요한 컬럼이 data에 있는지 검증
         all_needed = set()
@@ -270,7 +270,7 @@ def load_index_to_label(model_key):
 
 def predict_for_model(model, scaler_x, train_features, window,
                       input_date, target_column, data_source, key, model_key=None):
-    if target_column == "입고량":
+    if target_column == "volume_incoming":
         try:
             data_source = _load_main_data()
         except Exception:
@@ -344,16 +344,16 @@ for key in volume_models_config.keys():
 
 # ── DB UPSERT 헬퍼 ────────────────────────────────────────────
 _PRICE_COL_MAP = {
-    '중A':      'price_standard',
-    '중A_특':   'price_special',
-    '입고량':   'volume_incoming',
-    '재고량':   'volume_stock',
-    '입고율':   'volume_rate',
-    '제강생산량': 'steel_production',
-    '고철투입량': 'scrap_input',
-    '중부권':   'region_central',
-    '남부권':   'region_south',
-    '총계':     'region_total',
+    'price_standard': 'price_standard',
+    'price_special':  'price_special',
+    'volume_incoming': 'volume_incoming',
+    'volume_stock':   'volume_stock',
+    'volume_rate':    'volume_rate',
+    'steel_production': 'steel_production',
+    'scrap_input':    'scrap_input',
+    'region_central': 'region_central',
+    'region_south':   'region_south',
+    'region_total':   'region_total',
 }
 
 
@@ -468,7 +468,7 @@ def transfer_prediction():
                     train_features=price_features[key],
                     window=price_models_config[key]["window"],
                     input_date=input_date,
-                    target_column="중A",
+                    target_column="price_standard",
                     data_source=data,
                     key=key,
                     model_key=price_models_config[key]["model_key"],
@@ -485,7 +485,7 @@ def transfer_prediction():
                     train_features=special_price_features[key],
                     window=special_price_models_config[key]["window"],
                     input_date=input_date,
-                    target_column="중A_특",
+                    target_column="price_special",
                     data_source=special_data,
                     key=key,
                     model_key=special_price_models_config[key]["model_key"],
@@ -501,7 +501,7 @@ def transfer_prediction():
                     train_features=volume_features[key],
                     window=volume_models_config[key]["window"],
                     input_date=input_date,
-                    target_column="입고량",
+                    target_column="volume_incoming",
                     data_source=data,
                     key=key,
                 ) for key in volume_models
@@ -584,7 +584,7 @@ def load_model_predictions(model_key: str, selected_date: str) -> dict:
 def download_data_file():
     """기본 데이터 파일 다운로드 (DB → Excel 변환)"""
     try:
-        df = _load_prices_from_db().drop(columns=['중A_특'], errors='ignore')
+        df = _load_prices_from_db().drop(columns=['price_special'], errors='ignore')
         buf = io.BytesIO()
         df.to_excel(buf, index=False, engine='openpyxl')
         buf.seek(0)
@@ -602,7 +602,7 @@ def download_data_file():
 def download_special_data_file():
     """특구가 데이터 파일 다운로드 (DB → Excel 변환)"""
     try:
-        df = _load_prices_from_db().drop(columns=['중A'], errors='ignore')
+        df = _load_prices_from_db().drop(columns=['price_standard'], errors='ignore')
         buf = io.BytesIO()
         df.to_excel(buf, index=False, engine='openpyxl')
         buf.seek(0)
@@ -622,13 +622,13 @@ def get_recent_data():
         df = pd.read_sql("""
             SELECT
                 date             AS 일자,
-                price_standard   AS `중A`,
-                price_special    AS `중A_특`,
-                volume_incoming  AS 입고량,
-                volume_stock     AS 재고량,
-                volume_rate      AS 입고율,
-                steel_production AS 제강생산량,
-                scrap_input      AS 고철투입량
+                price_standard,
+                price_special,
+                volume_incoming,
+                volume_stock,
+                volume_rate,
+                steel_production,
+                scrap_input
             FROM steel_prices
             ORDER BY date DESC
             LIMIT 5
@@ -645,27 +645,27 @@ def get_recent_data():
 def save_data():
     try:
         req = request.json
-        입고량    = float(req.get("입고량", 0))
-        재고량    = float(req.get("재고량", 0))
-        제강생산량 = float(req.get("제강생산량", 0))
-        고철투입량 = float(req.get("고철투입량", 0))
-        중A       = int(float(req.get("중A", 0))) if req.get("중A") else None
-        중A_특    = int(float(req.get("중A_특", 0))) if req.get("중A_특") else None
-        일자      = req.get("일자", "")
+        vol_in   = float(req.get("volume_incoming", 0))
+        vol_stk  = float(req.get("volume_stock", 0))
+        stl_prod = float(req.get("steel_production", 0))
+        scrap    = float(req.get("scrap_input", 0))
+        price_st = int(float(req.get("price_standard", 0))) if req.get("price_standard") else None
+        price_sp = int(float(req.get("price_special",  0))) if req.get("price_special")  else None
+        date_str = req.get("일자", "")
 
-        입고율 = (입고량 / 고철투입량) if 고철투입량 != 0 else None
+        vol_rate = (vol_in / scrap) if scrap != 0 else None
 
-        date_val = pd.to_datetime(일자).date()
+        date_val = pd.to_datetime(date_str).date()
 
         _upsert_steel_prices({
             'date':             date_val,
-            'price_standard':   중A,
-            'price_special':    중A_특,
-            'volume_incoming':  입고량,
-            'volume_stock':     재고량,
-            'volume_rate':      round(입고율, 6) if 입고율 is not None else None,
-            'steel_production': 제강생산량,
-            'scrap_input':      고철투입량,
+            'price_standard':   price_st,
+            'price_special':    price_sp,
+            'volume_incoming':  vol_in,
+            'volume_stock':     vol_stk,
+            'volume_rate':      round(vol_rate, 6) if vol_rate is not None else None,
+            'steel_production': stl_prod,
+            'scrap_input':      scrap,
         })
 
         return jsonify({"message": "Data saved successfully!"}), 200
@@ -797,7 +797,7 @@ def run_crawling():
 def interpolate_data():
     """
     steel_prices 전체 날짜 범위를 재구성하고 결측값을 보간.
-    중A / 중A_특은 5단위 정수로 반올림.
+    price_standard / price_special은 5단위 정수로 반올림.
     """
     try:
         df = _load_prices_from_db()
@@ -813,22 +813,24 @@ def interpolate_data():
         df[numeric_cols] = df[numeric_cols].interpolate(method='time')
         df = df.reset_index().rename(columns={'index': '일자'})
 
-        if '중A' in df.columns:
-            df['중A'] = df['중A'].apply(lambda x: 5 * round(x / 5) if pd.notna(x) else None)
-        if '중A_특' in df.columns:
-            df['중A_특'] = df['중A_특'].apply(lambda x: 5 * round(x / 5) if pd.notna(x) else None)
+        if 'price_standard' in df.columns:
+            df['price_standard'] = df['price_standard'].apply(
+                lambda x: 5 * round(x / 5) if pd.notna(x) else None)
+        if 'price_special' in df.columns:
+            df['price_special'] = df['price_special'].apply(
+                lambda x: 5 * round(x / 5) if pd.notna(x) else None)
 
         # 보간된 데이터를 DB에 다시 저장
         for _, row in df.iterrows():
             _upsert_steel_prices({
                 'date':             row['일자'].date(),
-                'price_standard':   row.get('중A'),
-                'price_special':    row.get('중A_특'),
-                'volume_incoming':  row.get('입고량'),
-                'volume_stock':     row.get('재고량'),
-                'volume_rate':      row.get('입고율'),
-                'steel_production': row.get('제강생산량'),
-                'scrap_input':      row.get('고철투입량'),
+                'price_standard':   row.get('price_standard'),
+                'price_special':    row.get('price_special'),
+                'volume_incoming':  row.get('volume_incoming'),
+                'volume_stock':     row.get('volume_stock'),
+                'volume_rate':      row.get('volume_rate'),
+                'steel_production': row.get('steel_production'),
+                'scrap_input':      row.get('scrap_input'),
             })
 
         return jsonify({"message": "Interpolation completed successfully!"}), 200

@@ -37,16 +37,16 @@ def load_prices() -> pd.DataFrame:
     df = pd.read_sql("""
         SELECT
             date             AS 일자,
-            price_standard   AS 중A,
-            price_special    AS `중A_특`,
-            volume_incoming  AS 입고량,
-            volume_stock     AS 재고량,
-            volume_rate      AS 입고율,
-            steel_production AS 제강생산량,
-            scrap_input      AS 고철투입량,
-            region_central   AS 중부권,
-            region_south     AS 남부권,
-            region_total     AS 총계
+            price_standard,
+            price_special,
+            volume_incoming,
+            volume_stock,
+            volume_rate,
+            steel_production,
+            scrap_input,
+            region_central,
+            region_south,
+            region_total
         FROM steel_prices
         ORDER BY date
     """, _get_engine())
@@ -80,19 +80,20 @@ def load_data() -> pd.DataFrame:
 
 # ── 피처 그룹 분류 ────────────────────────────────────────────
 
-FEATURE_GROUPS = {
-    '타겟':       ['중A', '중A_특'],
-    '내부물동량': ['입고량', '재고량', '입고율', '제강생산량', '고철투입량', '중부권', '남부권', '총계'],
-    '고철가격':   ['일본H2', '일본HMS', '미국HMS', '한국H2', '일본', '미국', '터키', '러시아', 'H2', '수입가'],
-    '원자재':     ['철광석', '원료탄'],
-    '에너지':     ['Dubai', 'Brent', 'WTI', '두바이', '유가'],
-    '거시경제':   ['환율', '달러', '통화', 'M1', 'M2', '물가지수', 'PPI', 'CPI'],
-    '경기지표':   ['선행', '동행', '후행', 'BSI', 'CBSI', '뉴스심리', 'NSI', '심리지수'],
-    '건설수요':   ['건설수주', '건설기성', '착공', '수주'],
-    '철강생산':   ['조강', '전로', '전기로', '철근', '형강', '강판'],
-    '해운':       ['BDI', '벌크선', '컨테이너선', '해운'],
-    '금속시세':   ['LME', '구리', '아연', '알루미늄', '니켈'],
-    '증시':       ['KOSPI', 'KOSDAQ', 'S&P', 'NASDAQ'],
+# 피처 그룹 분류 키워드는 대외비로 공개되지 않습니다.
+# 모델 학습에 사용된 외부 경제 지표의 상세 항목은 공개 불가능합니다.
+FEATURE_GROUPS: dict = {
+    'target':           [],
+    'internal':         [],
+    'raw_material':     [],
+    'energy':           [],
+    'macro':            [],
+    'sentiment':        [],
+    'construction':     [],
+    'steel_production': [],
+    'shipping':         [],
+    'metal':            [],
+    'equity':           [],
 }
 
 

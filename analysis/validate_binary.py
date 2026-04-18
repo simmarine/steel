@@ -24,7 +24,7 @@ if str(_here) not in sys.path:
 
 from utils import load_data
 
-TARGET   = '중A'
+TARGET   = 'price_standard'
 HORIZONS = [10, 30, 60]
 N_SPLITS = 5
 

@@ -27,7 +27,7 @@ BINARY_SCALER_DIR   = BASE_DIR / 'binary_scaler'
 BINARY_FEATURES_DIR = BASE_DIR / 'binary_features'
 
 HORIZONS    = [10, 30, 60]
-TARGET      = '중A'
+TARGET      = 'price_standard'
 MODEL_NAMES = {10: 'XGBoost', 30: 'LogReg', 60: 'Ensemble'}
 
 # ── DB ───────────────────────────────────────────────────────
@@ -51,16 +51,16 @@ def _load_wide_data() -> pd.DataFrame:
     prices = pd.read_sql("""
         SELECT
             date             AS 일자,
-            price_standard   AS `중A`,
-            price_special    AS `중A_특`,
-            volume_incoming  AS 입고량,
-            volume_stock     AS 재고량,
-            volume_rate      AS 입고율,
-            steel_production AS 제강생산량,
-            scrap_input      AS 고철투입량,
-            region_central   AS 중부권,
-            region_south     AS 남부권,
-            region_total     AS 총계
+            price_standard,
+            price_special,
+            volume_incoming,
+            volume_stock,
+            volume_rate,
+            steel_production,
+            scrap_input,
+            region_central,
+            region_south,
+            region_total
         FROM steel_prices
         ORDER BY date
     """, _engine)

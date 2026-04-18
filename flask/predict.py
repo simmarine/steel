@@ -35,13 +35,13 @@ def _load_wide_data() -> pd.DataFrame:
     prices = pd.read_sql("""
         SELECT
             date             AS 일자,
-            price_standard   AS `중A`,
-            price_special    AS `중A_특`,
-            volume_incoming  AS 입고량,
-            volume_stock     AS 재고량,
-            volume_rate      AS 입고율,
-            steel_production AS 제강생산량,
-            scrap_input      AS 고철투입량
+            price_standard,
+            price_special,
+            volume_incoming,
+            volume_stock,
+            volume_rate,
+            steel_production,
+            scrap_input
         FROM steel_prices
         ORDER BY date
     """, _engine)
@@ -191,7 +191,7 @@ def process_version(version: str) -> pd.DataFrame:
     diff_size   = params["diff_size"]
     model_type  = int(version.split('_')[0])
 
-    target_col = '중A' if version.startswith('2_') else '중A_특'
+    target_col = 'price_standard' if version.startswith('2_') else 'price_special'
 
     # ── 데이터 로드 (DB → fallback Excel) ────────────────────
     try:

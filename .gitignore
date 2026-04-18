@@ -59,5 +59,20 @@ db.sql
 *.sql.gz
 *.dump
 
+# 크롤러 구현 (피처명/수집 대상 대외비)
+flask/crawl.py
+flask/crawlers/ecos.py
+flask/crawlers/kosis.py
+flask/crawlers/misc.py
+flask/crawlers/steelprice.py
+flask/crawlers/steeldaily.py
+
+# 크롤러 테스트 (피처명 주석 포함)
+flask/test_crawlers.py
+
+# 분석 노트북 (피처명/EDA 결과 포함)
+analysis/*.ipynb
+analysis/**/*.ipynb
+
 # 학습 데이터 / steelin 크롤링 임시 파일
 steelin/
